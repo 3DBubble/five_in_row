@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from five_in_row import FiveInRow
+from five_in_row import FiveInRow, InvalidMoveException
 
 class TestFiveInRow(unittest.TestCase):
     def setUp(self) -> None:
@@ -32,6 +32,22 @@ class TestFiveInRow(unittest.TestCase):
         expected_result[0, 0] = 1
         expected_result[1, 0] = -1
         self.assertTrue(np.array_equal(board_state, expected_result))
+    
+    def test_make_move_overlapping_second_move(self):
+        self.game.make_move(0, 0)
+        with self.assertRaises(InvalidMoveException) as context:
+            self.game.make_move(0, 0)
+        self.assertEqual(str(context.exception), "Place already taken")
+    
+    def test_make_move_out_of_bounds_move(self):
+        with self.assertRaises(InvalidMoveException) as context:
+            self.game.make_move(50, 49)
+        self.assertEqual(str(context.exception), "Place out of bounds")
+    
+    def test_make_move_negative_coordinate(self):
+        with self.assertRaises(InvalidMoveException) as context:
+            self.game.make_move(-1, 0)
+        self.assertEqual(str(context.exception), "Place out of bounds")
 
 if __name__ == '__main__':
     unittest.main()
