@@ -15,6 +15,15 @@ class PlaceState(IntEnum):
         else:
             return PlaceState.EMPTY
 
+class GameResult(IntEnum):
+    IN_PROGRESS = 0,
+    WHITE_WIN = 1,
+    BLACK_WIN = 2,
+    DRAW = 3
+
+class InvalidMoveException(Exception):
+    pass
+
 class FiveInRow:
     def __init__(self, board_shape = (50, 50)) -> None:
         self.__board = np.zeros(board_shape, dtype = np.int8)
@@ -38,8 +47,10 @@ class FiveInRow:
         self.check_valid_move(move_pos_x, move_pos_y)
 
         self.__board[move_pos_x, move_pos_y] = self.__next_move.value
+        self.__last_move_pos = (move_pos_x, move_pos_y)
         self.__next_move = PlaceState.toggle_move(self.__next_move)
-    
 
-class InvalidMoveException(Exception):
-    pass
+        return GameResult.IN_PROGRESS
+
+    def get_last_move(self):
+        return PlaceState.toggle_move(self.__next_move), self.__last_move_pos
