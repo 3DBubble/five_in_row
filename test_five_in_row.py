@@ -49,10 +49,6 @@ class TestFiveInRow(unittest.TestCase):
         with self.assertRaises(InvalidMoveException) as context:
             self.game.make_move(-1, 0)
         self.assertEqual(str(context.exception), "Place out of bounds")
-    
-    def test_return_value_from_make_move_is_gameresult_inprogress(self):
-        result = self.game.make_move(0, 0)
-        self.assertEqual(result, GameResult.IN_PROGRESS)
 
     def test_get_last_move(self):
         self.game.make_move(0, 0)
@@ -66,6 +62,43 @@ class TestFiveInRow(unittest.TestCase):
         last_move = (1, 1)
         _, last_move = self.game.get_last_move()
         self.assertEqual(last_move, (0, 0))
+
+    def test_get_last_move_before_first_move(self):
+        color, last_move = self.game.get_last_move()
+        self.assertEqual(color, PlaceState.BLACK)
+        self.assertEqual(last_move, None)
+    
+    def test_return_value_from_make_move_is_gameresult_inprogress(self):
+        result = self.game.make_move(0, 0)
+        self.assertEqual(result, GameResult.IN_PROGRESS)
+    
+    def test_white_win_horizontal(self):
+        for i in range(4):
+            self.game.make_move(0, i)
+            self.game.make_move(1, i)
+        result = self.game.make_move(0, 4)
+        self.assertEqual(result, GameResult.WHITE_WIN)
+    
+    def test_white_win_verticle(self):
+        for i in range(4):
+            self.game.make_move(i, 0)
+            self.game.make_move(i, 1)
+        result = self.game.make_move(4, 0)
+        self.assertEqual(result, GameResult.WHITE_WIN)
+    
+    def test_white_win_diagonal(self):
+        for i in range(4):
+            self.game.make_move(i, i)
+            self.game.make_move(i, i + 1)
+        result = self.game.make_move(4, 4)
+        self.assertEqual(result, GameResult.WHITE_WIN)
+    
+    def test_white_win_second_diagonal(self):
+        for i in range(4):
+            self.game.make_move(i, 4 - i)
+            self.game.make_move(i, 3 - i)
+        result = self.game.make_move(4, 0)
+        self.assertEqual(result, GameResult.WHITE_WIN)
 
 if __name__ == '__main__':
     unittest.main()
